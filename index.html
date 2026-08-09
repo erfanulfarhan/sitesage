@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SiteSage — an AI chat widget for any website</title>
+<meta name="description" content="Create an AI chatbot, train it on your text or web pages, and embed it on any site with one line of code. Multi-tenant, powered by Groq.">
+<style>
+  :root{--bg:#0a0b10;--card:#12141d;--card2:#171a25;--ink:#eceef5;--muted:#98a0b6;--faint:#6a7186;
+    --line:#232634;--a1:#6366f1;--a2:#22d3ee;--a3:#a855f7;--grad:linear-gradient(100deg,var(--a1),var(--a3) 55%,var(--a2));--ok:#34d399}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 1.1rem}
+  a{color:var(--a2)}
+  header{text-align:center;padding:3rem 0 1rem}
+  .badge{display:inline-block;font:600 .72rem/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--a2);
+    border:1px solid var(--line);border-radius:999px;padding:.4rem .8rem;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,6vw,3.2rem);margin:.2rem 0 .4rem;font-weight:850;letter-spacing:-.03em}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);max-width:54ch;margin:0 auto;font-size:1.05rem}
+  .grid{display:grid;grid-template-columns:300px 1fr;gap:1rem;padding:1.5rem 0 4rem;align-items:start}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:1.15rem;margin-bottom:1rem}
+  .panel h2{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 .8rem}
+  label{display:block;font-size:.8rem;color:var(--muted);margin:.6rem 0 .25rem}
+  input,textarea,select{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:9px;
+    padding:.6rem .7rem;font:inherit;outline:none}
+  input:focus,textarea:focus{border-color:var(--a1)}
+  textarea{min-height:84px;resize:vertical}
+  .row{display:flex;gap:.5rem}.row input{flex:1}
+  .btn{border:0;border-radius:9px;padding:.65rem .9rem;font:700 .9rem/1 inherit;color:#fff;cursor:pointer;
+    background:var(--grad);background-size:200% 200%;animation:shift 6s ease infinite;transition:.15s}
+  @keyframes shift{50%{background-position:100% 50%}}
+  .btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.5;transform:none;animation:none;cursor:default}
+  .btn.sm{padding:.45rem .7rem;font-size:.82rem}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);animation:none}
+  .btn.ghost:hover{color:var(--ink);border-color:var(--a3)}
+  .bots{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4rem}
+  .bots li{display:flex;justify-content:space-between;align-items:center;gap:.5rem;background:var(--bg);border:1px solid var(--line);
+    border-radius:9px;padding:.55rem .7rem;cursor:pointer;font-size:.92rem}
+  .bots li.active{border-color:var(--a1);background:#12142a}
+  .bots .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .status{font-size:.85rem;color:var(--muted);min-height:1.1em;margin-top:.5rem}
+  .src{display:flex;justify-content:space-between;gap:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;
+    padding:.45rem .65rem;font-size:.86rem;margin-top:.4rem}
+  .src .n{color:var(--faint);font-size:.76rem}
+  code,pre{background:#0c0e15;border:1px solid var(--line);border-radius:9px;color:#cdd3e6;font-size:.82rem}
+  pre{padding:.8rem;overflow:auto;white-space:pre-wrap;word-break:break-all;margin:.5rem 0}
+  .hint{color:var(--faint);font-size:.82rem}
+  .empty{color:var(--faint);text-align:center;padding:2rem 1rem}
+  .steps{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;color:var(--muted);font-size:.9rem;margin:.4rem 0 0}
+  .steps b{color:var(--a2)}
+  footer{text-align:center;color:var(--faint);font-size:.82rem;padding:1rem 0 3rem}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="badge">AI widget · multi-tenant · Groq</span>
+  <h1>Site<span class="grad-text">Sage</span></h1>
+  <p class="sub">Build an AI chatbot, train it on your text or web pages, and embed it on <b>any</b> website with one line of code.</p>
+  <div class="steps"><span><b>1.</b> Create a bot</span><span><b>2.</b> Add your content</span><span><b>3.</b> Copy the snippet</span></div>
+</header>
+
+<div class="wrap grid">
+  <aside>
+    <div class="panel">
+      <h2>Your bots</h2>
+      <ul class="bots" id="bots"></ul>
+      <p class="empty hint" id="botsEmpty">No bots yet.</p>
+      <button class="btn ghost sm" id="newBot" style="width:100%;margin-top:.6rem">+ New bot</button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- create form -->
+    <section class="panel" id="createPanel" hidden>
+      <h2>New bot</h2>
+      <label>Name</label>
+      <input id="cName" placeholder="Acme Support">
+      <label>Greeting</label>
+      <input id="cGreet" placeholder="Hi! Ask me anything about Acme.">
+      <label>Accent color</label>
+      <input id="cAccent" type="color" value="#6366f1" style="height:42px;padding:.2rem">
+      <button class="btn" id="createBtn" style="width:100%;margin-top:.8rem">Create bot</button>
+    </section>
+
+    <!-- selected bot -->
+    <div id="botView" hidden>
+      <section class="panel">
+        <h2>Train “<span id="bName"></span>”</h2>
+        <label>Paste text (docs, FAQ, about page…)</label>
+        <textarea id="pasteText" placeholder="Paste anything you want the bot to know…"></textarea>
+        <input id="pasteName" placeholder="Label for this source (optional)" style="margin-top:.4rem">
+        <button class="btn sm" id="addText" style="margin-top:.5rem">Add text</button>
+        <label style="margin-top:1rem">…or train on a web page</label>
+        <div class="row"><input id="url" placeholder="https://example.com/about"><button class="btn sm" id="addUrl">Fetch &amp; add</button></div>
+        <div class="status" id="trainStatus"></div>
+        <div id="srcList"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Embed on any site</h2>
+        <p class="hint">Paste this once, just before <code>&lt;/body&gt;</code>:</p>
+        <pre id="snippet"></pre>
+        <div class="row">
+          <button class="btn sm" id="copyBtn">Copy snippet</button>
+          <button class="btn ghost sm" id="previewBtn">Load live preview ↘</button>
+          <button class="btn ghost sm" id="delBot">Delete bot</button>
+        </div>
+        <p class="hint" style="margin-top:.6rem">Live preview loads the real widget on this page (bottom-right bubble).</p>
+      </section>
+    </div>
+  </main>
+</div>
+
+<footer class="wrap">Multi-tenant chatbot platform · Postgres full-text retrieval + Groq (Llama 3.3 70B) · Built by Erfanul Hakim Farhan</footer>
+
+<script>window.SUPA = { url: 'https://cgebymftbitnkdemttow.supabase.co', anon: 'sb_publishable_8kKUdKYucRKPnxp0yJtevA_zP8Vw-f7' };</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -10,6 +10,18 @@
     --line:#232634;--a1:#6366f1;--a2:#22d3ee;--a3:#a855f7;--grad:linear-gradient(100deg,var(--a1),var(--a3) 55%,var(--a2));--ok:#34d399}
   *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+  /* Haikei-style animated gradient-blob backdrop */
+  .hkbg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .hkbg svg{width:100%;height:100%}
+  .hkbg circle{transform-box:fill-box;transform-origin:center}
+  .hkbg .b1{animation:hk1 26s ease-in-out infinite}
+  .hkbg .b2{animation:hk2 32s ease-in-out infinite}
+  .hkbg .b3{animation:hk3 30s ease-in-out infinite}
+  @keyframes hk1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(6%,5%) scale(1.12)}}
+  @keyframes hk2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-5%,6%) scale(1.16)}}
+  @keyframes hk3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(4%,-6%) scale(1.1)}}
+  header,.wrap,footer{position:relative;z-index:1}
+  @media(prefers-reduced-motion:reduce){.hkbg .b1,.hkbg .b2,.hkbg .b3{animation:none}}
   .wrap{max-width:1000px;margin:0 auto;padding:0 1.1rem}
   a{color:var(--a2)}
   header{text-align:center;padding:3rem 0 1rem}
@@ -54,6 +66,20 @@
 </style>
 </head>
 <body>
+<div class="hkbg" aria-hidden="true">
+  <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="hg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+      <linearGradient id="hg2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+      <filter id="hkblur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="70"/></filter>
+    </defs>
+    <g filter="url(#hkblur)" opacity="0.5">
+      <circle class="b1" cx="170" cy="150" r="220" fill="url(#hg1)"/>
+      <circle class="b2" cx="650" cy="230" r="200" fill="#22d3ee" opacity="0.75"/>
+      <circle class="b3" cx="440" cy="540" r="240" fill="url(#hg2)"/>
+    </g>
+  </svg>
+</div>
 <header class="wrap">
   <span class="badge">AI widget · multi-tenant · Groq</span>
   <h1>Site<span class="grad-text">Sage</span></h1>

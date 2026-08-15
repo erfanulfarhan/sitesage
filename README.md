@@ -15,7 +15,7 @@ That's it — a chat bubble appears, answering only from the content you trained
 - **Dashboard** — create a bot, then feed it pasted text or a URL (server-side scrape → readable text).
 - **Retrieval** — content is chunked and searched with **Postgres full-text search** via a
   `SECURITY DEFINER` function scoped to the bot id, so the widget can only ever read its own bot.
-- **Answers** — the top passages go to **Groq (Llama 3.3 70B)**, which answers only from them.
+- **Answers** — the top passages go to **Groq (GPT OSS 120B)**, which answers only from them.
 - **Widget** — a tiny, dependency-free script (no model download) that runs on any origin (CORS-open API).
 
 ## Stack
@@ -24,7 +24,7 @@ That's it — a chat bubble appears, answering only from the content you trained
 | Dashboard | Vanilla JS + Supabase JS |
 | Data | Supabase Postgres, full-text `tsvector` index, multi-tenant `bots` / `bot_chunks` |
 | API | Vercel serverless: `/api/chat`, `/api/meta`, `/api/scrape` |
-| AI | Groq `llama-3.3-70b-versatile` (key stays server-side) |
+| AI | Groq `openai/gpt-oss-120b` (key stays server-side) |
 | Widget | ~4 KB self-contained `widget.js` |
 
 ---

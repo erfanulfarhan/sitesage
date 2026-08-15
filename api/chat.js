@@ -6,7 +6,7 @@
 const SUPA_URL = 'https://cgebymftbitnkdemttow.supabase.co';
 const SUPA_ANON = 'sb_publishable_8kKUdKYucRKPnxp0yJtevA_zP8Vw-f7';
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.3-70b-versatile';
+const MODEL = 'openai/gpt-oss-120b';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
